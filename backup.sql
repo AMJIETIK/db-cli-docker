@@ -68,20 +68,19 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.users (id, name, email, date_registered) FROM stdin;
-1	Vlad	vladpopov432@gmail.com	2025-04-23 20:14:19.562837
-2	Ilya Sokolov	ilyaMJTV@gmail.com	2025-04-23 21:18:17.910995
-4	Anna Ivanova	anna.ivanova@gmail.com	2024-01-12 00:00:00
-5	John Smith	john.smith@gmail.com	2024-02-18 00:00:00
-6	Maria Garcia	maria.garcia@gmail.com	2024-03-05 00:00:00
-7	Liam Brown	liam.brown@gmail.com	2024-03-21 00:00:00
-8	Sophia Wilson	sophia.wilson@gmail.com	2024-04-01 00:00:00
-9	James Johnson	james.johnson@gmail.com	2024-04-10 00:00:00
-10	Emily Davis	emily.davis@gmail.com	2024-04-12 00:00:00
-11	Michael Miller	michael.miller@gmail.com	2024-04-14 00:00:00
-14	Olivia Thomas	olivia.thomas@gmail.com	2024-04-18 00:00:00
-15	Benjamin Taylor	benjamin.taylor@gmail.com	2024-04-20 00:00:00
-16	Charlotte Moore	charlotte.moore@gmail.com	2024-04-21 00:00:00
-17	Ethan Jackson	ethan.jackson@gmail.com	2024-04-22 00:00:00
+1	Ilya Sokolov	ilyaMJTV@gmail.com	2025-04-23 21:18:17.910995
+2	Anna Ivanova	anna.ivanova@gmail.com	2024-01-12 00:00:00
+3	John Smith	john.smith@gmail.com	2024-02-18 00:00:00
+4	Maria Garcia	maria.garcia@gmail.com	2024-03-05 00:00:00
+5	Liam Brown	liam.brown@gmail.com	2024-03-21 00:00:00
+6	Sophia Wilson	sophia.wilson@gmail.com	2024-04-01 00:00:00
+7	James Johnson	james.johnson@gmail.com	2024-04-10 00:00:00
+8	Emily Davis	emily.davis@gmail.com	2024-04-12 00:00:00
+9	Michael Miller	michael.miller@gmail.com	2024-04-14 00:00:00
+10	Olivia Thomas	olivia.thomas@gmail.com	2024-04-18 00:00:00
+11	Benjamin Taylor	benjamin.taylor@gmail.com	2024-04-20 00:00:00
+12	Charlotte Moore	charlotte.moore@gmail.com	2024-04-21 00:00:00
+13	Ethan Jackson	ethan.jackson@gmail.com	2024-04-22 00:00:00
 \.
 
 
