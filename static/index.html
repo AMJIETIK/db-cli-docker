@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>User Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #users-section {
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out, padding 0.5s ease-in-out;
+        }
+
+        #users-section.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        #users-section.expanded {
+            max-height: 500px;
+            opacity: 1;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        #user-list li {
+            animation: fadeIn 0.3s ease-in forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Add User</h1>
+    <form id="user-form" class="space-y-4">
+        <div>
+            <input type="text" id="name" placeholder="Name" required
+                   class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+        </div>
+        <div>
+            <input type="email" id="email" placeholder="Email" required
+                   class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+        </div>
+        <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">
+            Submit
+        </button>
+    </form>
+
+    <h2 class="text-xl font-semibold text-gray-800 mt-8 mb-4 text-center">User List</h2>
+    <div class="space-y-2 mb-4">
+        <button id="load-users"
+                class="w-full bg-gray-600 text-white py-2 rounded-md hover:bg-gray-700 transition flex items-center justify-center">
+            <span id="load-text">Load</span>
+            <svg id="load-spinner" class="hidden animate-spin h-5 w-5 ml-2 text-white" xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+        </button>
+        <button id="toggle-users"
+                class="hidden w-full bg-gray-400 text-white py-2 rounded-md hover:bg-gray-500 transition flex items-center justify-center">
+            <span id="toggle-text">Collapse</span>
+            <svg id="toggle-icon" class="h-5 w-5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+    </div>
+    <div id="users-section" class="collapsed">
+        <div id="search-container" class="hidden mb-4">
+            <input type="text" id="search-input" placeholder="Search by name or email"
+                   class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+        </div>
+        <div class="max-h-64 overflow-y-auto border rounded-md p-3 bg-gray-50">
+            <ul id="user-list" class="space-y-2"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allUsers = [];
+    let isUsersSectionVisible = false;
+
+    document.getElementById('user-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+
+        const response = await fetch('/users', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name, email})
+        });
+
+        const text = await response.text();
+        alert(text);
+    });
+
+    document.getElementById('load-users').addEventListener('click', async function () {
+        const button = this;
+        const loadText = document.getElementById('load-text');
+        const spinner = document.getElementById('load-spinner');
+        const list = document.getElementById('user-list');
+        const searchContainer = document.getElementById('search-container');
+        const searchInput = document.getElementById('search-input');
+        const toggleButton = document.getElementById('toggle-users');
+        const usersSection = document.getElementById('users-section');
+
+        button.disabled = true;
+        loadText.textContent = 'Loading...';
+        spinner.classList.remove('hidden');
+        searchContainer.classList.add('hidden');
+        toggleButton.classList.add('hidden');
+        usersSection.classList.add('collapsed');
+
+        try {
+            const res = await fetch('/users/list');
+            allUsers = await res.json();
+            usersSection.classList.remove('collapsed');
+            usersSection.classList.add('expanded');
+            searchContainer.classList.remove('hidden');
+            toggleButton.classList.remove('hidden');
+            searchInput.value = '';
+            renderUsers(allUsers);
+            isUsersSectionVisible = true;
+            document.getElementById('toggle-text').textContent = 'Collapse';
+            document.getElementById('toggle-icon').setAttribute('d', 'M19 9l-7 7-7-7');
+        } catch (error) {
+            list.innerHTML = '<li class="text-red-500 p-3">Error loading users</li>';
+        } finally {
+            button.disabled = false;
+            loadText.textContent = 'Load';
+            spinner.classList.add('hidden');
+        }
+    });
+
+    document.getElementById('toggle-users').addEventListener('click', function () {
+        const usersSection = document.getElementById('users-section');
+        const toggleText = document.getElementById('toggle-text');
+        const toggleIcon = document.getElementById('toggle-icon');
+
+        isUsersSectionVisible = !isUsersSectionVisible;
+        if (isUsersSectionVisible) {
+            usersSection.classList.remove('collapsed');
+            usersSection.classList.add('expanded');
+            toggleText.textContent = 'Collapse';
+            toggleIcon.setAttribute('d', 'M19 9l-7 7-7-7');
+        } else {
+            usersSection.classList.remove('expanded');
+            usersSection.classList.add('collapsed');
+            toggleText.textContent = 'Expand';
+            toggleIcon.setAttribute('d', 'M5 15l7-7 7 7');
+        }
+    });
+
+    document.getElementById('search-input')?.addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        const filteredUsers = allUsers.filter(user =>
+            user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
+        );
+        renderUsers(filteredUsers);
+    });
+
+    function renderUsers(users) {
+        const list = document.getElementById('user-list');
+        list.innerHTML = '';
+        users.forEach((user, index) => {
+            const li = document.createElement('li');
+            li.className = 'p-3 bg-white rounded-md shadow-sm hover:bg-gray-100 transition opacity-0 animate-[fadeIn_0.3s_ease-in-forwards]';
+            li.style.animationDelay = `${index * 0.05}s`;
+
+            const container = document.createElement('div');
+            container.className = 'flex items-start justify-between';
+
+            const content = document.createElement('div');
+            content.className = 'flex flex-col';
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = user.name;
+            nameSpan.className = 'font-semibold';
+            const emailSpan = document.createElement('span');
+            emailSpan.textContent = `(${user.email})`;
+            content.appendChild(nameSpan);
+            content.appendChild(emailSpan);
+
+            const actions = document.createElement('div');
+            actions.className = 'flex flex-col space-y-2 ml-4 mt-1';
+
+            const btnClass = 'min-w-[110px] text-white px-3 py-1 rounded text-sm';
+
+            const editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            editBtn.className = `${btnClass} bg-blue-500 hover:bg-blue-600`;
+            editBtn.onclick = () => {
+                const nameInput = document.createElement('input');
+                nameInput.value = user.name;
+                nameInput.className = 'border px-2 py-1 rounded text-sm w-full mb-1';
+
+                const emailInput = document.createElement('input');
+                emailInput.value = user.email;
+                emailInput.className = 'border px-2 py-1 rounded text-sm w-full';
+
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = 'Save';
+                saveBtn.className = 'w-full bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm mt-2';
+                saveBtn.onclick = async () => {
+                    await fetch('/users/update', {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({oldEmail: user.email, name: nameInput.value, email: emailInput.value})
+                    });
+                    document.getElementById('load-users').click();
+                };
+
+                content.innerHTML = '';
+                content.appendChild(nameInput);
+                content.appendChild(emailInput);
+                actions.innerHTML = '';
+                actions.appendChild(saveBtn);
+            };
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.className = `${btnClass} bg-red-500 hover:bg-red-600`;
+            deleteBtn.onclick = async () => {
+                if (confirm(`Delete ${user.name}?`)) {
+                    await fetch('/users/delete', {
+                        method: 'DELETE',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({email: user.email})
+                    });
+                    document.getElementById('load-users').click();
+                }
+            };
+
+            actions.appendChild(editBtn);
+            actions.appendChild(deleteBtn);
+
+            container.appendChild(content);
+            container.appendChild(actions);
+            li.appendChild(container);
+            list.appendChild(li);
+        });
+    }
+</script>
+</body>
+</html>
