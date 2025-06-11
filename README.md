@@ -39,6 +39,15 @@ DATABASE_URL=postgres://your_name:your_pass@db:5432/db
 ```
 _(Replace your ... with your data.)_
 
+P.S. - Database Backup
+A backup file (backup.sql) is included in this repository. You can use it to populate the PostgreSQL database with sample data for testing. To load the backup
+write this stroke into your terminal or exec it into docker container:
+
+```bash
+psql -U username -d dbname -f backup.sql
+```
+**(Don't forget to replace username and dbname with your data)**
+
 3. Build and run the project using Docker Compose:
 ```bash
 docker-compose up --build

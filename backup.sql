@@ -82,8 +82,6 @@ COPY public.users (id, name, email, date_registered) FROM stdin;
 15	Benjamin Taylor	benjamin.taylor@gmail.com	2024-04-20 00:00:00
 16	Charlotte Moore	charlotte.moore@gmail.com	2024-04-21 00:00:00
 17	Ethan Jackson	ethan.jackson@gmail.com	2024-04-22 00:00:00
-20	Diana Karas	dianakar@gmail.com	2025-05-03 18:08:12.86209
-21	maciej biernat	maciek111@gmail.com	2025-05-08 10:57:28.102072
 \.
 
 
