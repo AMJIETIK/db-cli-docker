@@ -8,7 +8,7 @@ This application allows you to:
 - View a list of users.
 - Update user details.
 - Delete users.
-Data is stored in a PostgreSQL database running within a Docker container.
+  Data is stored in a PostgreSQL database running within a Docker container.
 
 ---
 ## Installation
@@ -24,12 +24,18 @@ git clone https://github.com/AMJIETIK/db-cli-docker.git
 cd db-cli-docker
 ```
 
-2. Create a .env file in the backend directory with the following environment variables:
+2. Create a .env file in root and backend directory with the following environment variables:
+
+root:
+```env
+POSTGRES_USER=your_name
+POSTGRES_PASSWORD=your_pass
+POSTGRES_DB=your_db
 ```
-POSTGRES_USER=your_user
-POSTGRES_PASSWORD=your_password 
-POSTGRES_DB=your_dbName
-DATABASE_URL=your_dbName://stormside7:your_password@db:5432/your_user
+
+backend:
+```env
+DATABASE_URL=postgres://your_name:your_pass@db:5432/db
 ```
 _(Replace your ... with your data.)_
 
@@ -58,7 +64,7 @@ After launching the application, open http://localhost:8080 in your browser. You
 curl -X POST -H "Content-Type: application/json" -d '{"name":"John","email":"john@example.com"}' http://localhost:8080/users
 ```
 
-- **Get User List** (GET):   
+- **Get User List** (GET):
 ```bash
 curl http://localhost:8080/users/list
 ```
